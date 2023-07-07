@@ -124,4 +124,13 @@ internal class Program
 
         return s;
     }
+
+    static string c_instruction(string s)
+    {
+        string result = "";
+
+
+
+        return result;
+    }
 }
