@@ -31,6 +31,8 @@ internal class Program
 
     static Dictionary<string, int> used_keywords = new Dictionary<string, int>();
 
+    static Dictionary<string, int>
+
     static int n = 16;
     private static void Main(string[] args)
     {
@@ -48,8 +50,24 @@ internal class Program
                 binary_line = a_instruction(temp);
                 Console.WriteLine(binary_line);
             }
+            else if (line.StartsWith("("))
+            {
+                if(!line.EndsWith(")"))
+                {
+                    Console.WriteLine("Cannot Parse Line.");
+                    return;//error out
+                }
+                else
+                {
+                    temp = line.Replace("(", "");
+                    temp = line.Replace(")", "");
+                    binary_line = a_instruction(temp);
+                    Console.WriteLine(binary_line);
+                }
+            }
             else
             {
+
                 Console.WriteLine(line);
             }
         }
@@ -129,7 +147,7 @@ internal class Program
     {
         string result = "";
 
-
+        
 
         return result;
     }
