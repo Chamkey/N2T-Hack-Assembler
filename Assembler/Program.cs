@@ -1,18 +1,8 @@
-﻿internal class Program
+﻿using System.IO;
+
+internal class Program
 {
-    private static void Main(string[] args)
-    {
-        string f2r = @"Prog.asm";
-        string[] lines = File.ReadAllLines(f2r);
-        List<string> l_list = new List<string>(lines);
-        l_list = format_lines(l_list);
-
-        foreach (string line in l_list)
-        {
-            Console.WriteLine(line);
-        }
-
-        Dictionary<string, int> special_cases = new Dictionary<string, int>
+    static Dictionary<string, int> special_cases = new Dictionary<string, int>
         {
             {"SP", 0},
             {"LCL", 1},
@@ -38,9 +28,32 @@
             {"R14", 14},
             {"R15", 15}
         };
+
+    static Dictionary<string, int> used_keywords = new Dictionary<string, int>();
+
+    static int n = 16;
+    private static void Main(string[] args)
+    {
+        string f2r = @"Prog.asm";
+        List<string> lines = File.ReadLines(f2r).ToList();
+        lines = format_lines(lines);
+        string binary_line;
+        string temp;
+        foreach (string line in lines)
+        {
+            if (line.StartsWith("@"))
+            {
+                //remove @ symbol
+                temp = line.Replace("@", "");
+                binary_line = a_instruction(temp);
+                Console.WriteLine(binary_line);
+            }
+            else
+            {
+                Console.WriteLine(line);
+            }
+        }
     }
-
-
 
     static List<string> format_lines(List<string> lines)
     {
@@ -63,16 +76,52 @@
     }
 
 
-    static string remove_comments(string l)
+    static string remove_comments(string s)
     {
-        if (l.Contains("//"))
+        if (s.Contains("//"))
         {
-            var ind = l.IndexOf("//");
+            var ind = s.IndexOf("//");
             if (ind >= 0)
             {
-                l = l.Remove(ind);
+                s = s.Remove(ind);
             }
         }
-        return l;
+        return s;
+    }
+
+    static string a_instruction(string s)
+    {
+        string result;
+        //if the string is a special case
+        if (special_cases.ContainsKey(s))
+        {
+            result = convert_to_binary(special_cases[s]);
+        }
+        else if (used_keywords.ContainsKey(s))
+        {
+            result = convert_to_binary(used_keywords[s]);
+        }
+        else if (int.TryParse(s, out int number))
+        {
+            result = convert_to_binary(number);
+        }
+        else //this is not in the previous cases but is a word, not a number
+        {
+            result = convert_to_binary(n);
+            used_keywords.Add(s, n);
+            n += 1;
+        }
+
+        return result;
+    }
+
+    static string convert_to_binary(int value)
+    {
+        string s = "0";
+        string temp = Convert.ToString(value, 2);
+        temp = temp.PadLeft(15, '0');
+        s += temp;
+
+        return s;
     }
 }
